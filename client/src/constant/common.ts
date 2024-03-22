@@ -7,5 +7,6 @@ export const REDUCERS = {
 }
 
 export const ACTIONS = {
+  GET_POSTS: "postsSlice/getPosts",
   CREATE_POSTS: "postsSlice/createPosts",
 }

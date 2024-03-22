@@ -4,6 +4,11 @@ import postApi from "src/api/post-api";
 import { ACTIONS, REDUCERS } from "src/constant";
 import { Post } from "src/interfaces";
 
+export const getPosts = createAsyncThunk(ACTIONS.GET_POSTS, async () => {
+  const response = await postApi.getPosts();
+  return response?.data || [];
+});
+
 export const createPosts = createAsyncThunk(ACTIONS.CREATE_POSTS,
   async (newPost: Post, thunkApi) => {
     try {
@@ -35,21 +40,23 @@ const postsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createPosts.pending, (state, action) => {
-        console.log("createPosts pending: ", action);
-        state.loading = true;
+      .addCase(getPosts.fulfilled, (state, action) => {
+        console.log("getPosts: ", action);
+        state.loading = false;
+        state.data = action.payload;
       })
       .addCase(createPosts.fulfilled, (state, action: PayloadAction<Post>) => {
-        console.log("createPosts: ", action);
         state.loading = false;
         if (action.payload) {
           state.data.push(action.payload);
         }
       })
       .addCase(createPosts.rejected, (state, action: PayloadAction<any>) => {
-        console.log("createPosts error: ", action);
         state.loading = false;
         state.error = action.payload;
+      })
+      .addMatcher((action) => action.type.endsWith('pending'), (state, action) => {
+        state.loading = true;
       })
   }
 })
