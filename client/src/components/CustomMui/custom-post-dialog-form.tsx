@@ -1,5 +1,5 @@
-import { ErrorOutlineOutlined, PostAdd } from '@mui/icons-material';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Edit, ErrorOutlineOutlined, PostAdd } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -10,39 +10,34 @@ import {
   DialogTitle,
   Grid,
   LinearProgress,
-  TextField,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import CustomTextField from './custom-text-field';
-import { Post, PostRequest } from 'src/interfaces/post.interface';
-import CustomMuiFileInput from './custom-mui-file-input';
-import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
-import { createPosts } from 'src/reducers/postSlice';
-import { PayloadAction } from '@reduxjs/toolkit';
+import { Post, PostRequest } from 'src/interfaces/post.interface';
+import { createPosts, updatePost } from 'src/reducers/postSlice';
+import * as yup from 'yup';
+import CustomMuiFileInput from './custom-mui-file-input';
+import CustomTextField from './custom-text-field';
+import { base64ToFile } from 'src/Utils/file';
 
-export interface ICustomPostDialogProps {
+export interface CustomPostDialogFormProps {
   isOpen: boolean;
   children?: React.ReactNode;
   onHandleSnackBar?: (status: PostRequest) => void;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  postEdit?: Post;
 }
 
-type CreatePostsAction = PayloadAction<
-  Post,
-  string,
-  { arg: Post; requestId: string; requestStatus: 'fulfilled' }
->;
-
-export default function CustomPostDialog(props: ICustomPostDialogProps) {
-  const { isOpen, setOpen, onHandleSnackBar } = props;
-  const [fileStringValue, setFileStringValue] = useState('');
+export default function CustomPostDialogForm(props: CustomPostDialogFormProps) {
+  const { isOpen, setOpen, onHandleSnackBar, postEdit } = props;
+  const [fileValue, setFileValue] = useState({
+    base64String: '',
+    fileName: '',
+  });
 
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.posts);
-
-  console.log('error: ', error);
 
   const schema = yup.object().shape({
     creator: yup
@@ -91,12 +86,22 @@ export default function CustomPostDialog(props: ICustomPostDialogProps) {
   };
 
   const onSubmit = async (newPost: Post) => {
-    newPost = { ...newPost, selectedFile: fileStringValue };
-    console.log('newPost: ', newPost);
+    newPost = {
+      ...newPost,
+      selectedFile: fileValue.base64String,
+      fileName: fileValue.fileName,
+    };
 
-    const result = (await dispatch(createPosts(newPost))) as any;
+    let result = null;
+    if (postEdit?._id) {
+      result = await dispatch(
+        updatePost({ id: postEdit._id, updatePost: newPost }),
+      );
+    } else {
+      result = (await dispatch(createPosts(newPost))) as any;
+    }
+
     const hasError = result?.error?.message ?? '';
-
     if (!hasError) {
       reset();
       setOpen(false);
@@ -116,12 +121,34 @@ export default function CustomPostDialog(props: ICustomPostDialogProps) {
 
       reader.onload = () => {
         const base64String = reader.result as string;
-        setFileStringValue(base64String);
+        setFileValue({ base64String: base64String, fileName: file.name });
       };
 
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    if (postEdit?._id) {
+      console.log('Post edit: ', postEdit);
+      reset({
+        _id: postEdit._id,
+        creator: postEdit.creator,
+        title: postEdit.title,
+        message: postEdit.message,
+        tags: postEdit.tags,
+        selectedFile: base64ToFile(
+          postEdit.selectedFile as string,
+          postEdit?.fileName ?? '',
+        ),
+      });
+
+      setFileValue({
+        base64String: postEdit.selectedFile as string,
+        fileName: postEdit?.fileName ?? '',
+      });
+    }
+  }, [postEdit]);
 
   return (
     <>
@@ -142,10 +169,11 @@ export default function CustomPostDialog(props: ICustomPostDialogProps) {
 
         <DialogTitle>
           <Grid container alignItems="center" spacing={1}>
-            <Grid item>Creating a Post</Grid>
+            <Grid item>{postEdit ? 'Updating' : 'Creating'} a Post</Grid>
             <Grid item>
               <Box sx={{ pt: 1 }}>
-                <PostAdd color="primary" />
+                {postEdit && <Edit color="secondary" />}
+                {!postEdit && <PostAdd color="primary" />}
               </Box>
             </Grid>
           </Grid>
@@ -215,7 +243,7 @@ export default function CustomPostDialog(props: ICustomPostDialogProps) {
             onClick={handleSubmit(onSubmit)}
             disabled={loading}
           >
-            Submit
+            {postEdit ? 'Update' : 'Submit'}
           </Button>
         </DialogActions>
       </Dialog>

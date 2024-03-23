@@ -19,10 +19,19 @@ function stringToColor(string: string) {
 }
 
 export const stringAvatar = (name: string) => {
+  const parts = name.split(' ');
+  let initials = '';
+
+  if (parts.length >= 2) {
+    initials = `${parts[0][0]}${parts[1][0]}`
+  } else if (parts.length === 1) {
+    initials = parts[0][0]
+  }
+
   return {
     sx: {
       bgcolor: stringToColor(name),
     },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+    children: initials.toUpperCase(),
   };
 }

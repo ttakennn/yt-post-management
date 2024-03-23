@@ -18,9 +18,12 @@ import {
   Typography,
   styled,
 } from '@mui/material';
+import { useConfirm } from 'material-ui-confirm';
 import moment from 'moment';
 import { stringAvatar } from 'src/Utils';
+import { useAppDispatch } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
+import { deletePost, likePost } from 'src/reducers/postSlice';
 
 // const CustomCardContent = styled(CardContent)`
 //   > p {
@@ -40,10 +43,41 @@ const CustomCardContent = styled(CardContent)(({ theme }) => ({
 
 export interface IPostDetailsProps {
   post: Post;
+  onEditPost?: (post: Post) => void;
+  onLikePost?: (post: Post) => void;
 }
 
-export default function PostDetails({ post }: IPostDetailsProps) {
-  console.log('post details: ', post);
+export default function PostDetails({
+  post,
+  onEditPost,
+  onLikePost,
+}: IPostDetailsProps) {
+  const confirm = useConfirm();
+
+  const dispatch = useAppDispatch();
+
+  const onPostEditChange = (post: Post) => {
+    if (onEditPost) {
+      onEditPost(post);
+    }
+  };
+
+  const onDeleteChange = (id: string) => {
+    confirm({
+      title: `Are you sure delete this post?`,
+    })
+      .then(() => dispatch(deletePost({ id: id })))
+      .catch(() => console.log('Cancel delete!'));
+  };
+
+  const handleLikePost = (post: Post) => {
+    dispatch(likePost({ id: post?._id ?? '' }));
+
+    if (onLikePost) {
+      onLikePost(post);
+    }
+  };
+
   return (
     <Card
       sx={{
@@ -58,7 +92,10 @@ export default function PostDetails({ post }: IPostDetailsProps) {
       <CardHeader
         avatar={<Avatar sizes="small" {...stringAvatar(post.creator)} />}
         action={
-          <IconButton aria-label="edit-card">
+          <IconButton
+            aria-label="edit-card"
+            onClick={() => onPostEditChange(post)}
+          >
             <Edit fontSize="small" />
           </IconButton>
         }
@@ -108,10 +145,18 @@ export default function PostDetails({ post }: IPostDetailsProps) {
           justifyContent: 'space-between',
         }}
       >
-        <Button size="small" color="primary">
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => handleLikePost(post)}
+        >
           <ThumbUpAlt fontSize="small" /> &nbsp; {post.likeCount}
         </Button>
-        <Button size="small" color="primary">
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => onDeleteChange(post?._id ?? '')}
+        >
           <DeleteOutline fontSize="small" /> &nbsp; Delete
         </Button>
       </CardActions>

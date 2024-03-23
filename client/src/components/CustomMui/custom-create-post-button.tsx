@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import { Alert, AlertTitle, Button, Snackbar } from '@mui/material';
 import { useState } from 'react';
-import CustomPostDialog from './custom-post-dialog';
+import CustomPostDialogForm from './custom-post-dialog-form';
 import { PostRequest } from 'src/interfaces';
 
 export interface ICustomPostButtonProps {
@@ -45,7 +45,7 @@ export default function CustomPostButton(props: ICustomPostButtonProps) {
         {title}
       </Button>
 
-      <CustomPostDialog
+      <CustomPostDialogForm
         isOpen={openDialog}
         setOpen={setOpenDialog}
         onHandleSnackBar={onHandleSnackBarChange}

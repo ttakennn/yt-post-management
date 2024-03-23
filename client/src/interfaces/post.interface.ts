@@ -5,6 +5,7 @@ export interface Post {
   message: string;
   tags: string;
   selectedFile: File | string | null;
+  fileName?: string;
   createdAt?: string;
   likeCount?: number;
 }

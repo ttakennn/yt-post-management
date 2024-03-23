@@ -28,6 +28,53 @@ export const createPosts = createAsyncThunk(ACTIONS.CREATE_POSTS,
   }
 );
 
+export const updatePost = createAsyncThunk<Post, { id: string, updatePost: Post }>(
+  ACTIONS.UPDATE_POSTS, async ({ id, updatePost }, thunkApi) => {
+    try {
+      const response = await postApi.updatePost(id, updatePost);
+
+      return response?.data || [];
+    } catch (error: any) {
+      const errorMessage = error.message;
+      return thunkApi.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const deletePost = createAsyncThunk<string, { id: string | null }>(
+  ACTIONS.DELETE_POSTS, async ({ id }, thunkApi) => {
+    try {
+      if (id === null) {
+        return thunkApi.rejectWithValue("Failed to delete post");
+      }
+
+      await postApi.deletePost(id);
+
+      return id;
+    } catch (error: any) {
+      const errorMessage = error.message;
+      return thunkApi.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const likePost = createAsyncThunk<Post, { id: string | null }>(
+  ACTIONS.LIKE_POSTS, async ({ id }, thunkApi) => {
+    try {
+      if (id === null) {
+        return thunkApi.rejectWithValue("Failed to like post");
+      }
+
+      const response = await postApi.likePost(id);
+
+      return response?.data || [];
+    } catch (error: any) {
+      const errorMessage = error.message;
+      return thunkApi.rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const initialState = {
   loading: false,
   error: null,
@@ -51,12 +98,28 @@ const postsSlice = createSlice({
           state.data.push(action.payload);
         }
       })
-      .addCase(createPosts.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(updatePost.fulfilled, (state, action: PayloadAction<Post>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.data = state.data.map((post: Post) =>
+          post._id === action.payload._id ? action.payload : post
+        )
+      })
+      .addCase(deletePost.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        state.data = state.data.filter((post: Post) => post._id !== action.payload);
+      })
+      .addCase(likePost.fulfilled, (state, action: PayloadAction<Post>) => {
+        state.loading = false;
+        state.data = state.data.map((post: Post) =>
+          post._id === action.payload._id ? action.payload : post
+        )
       })
       .addMatcher((action) => action.type.endsWith('pending'), (state, action) => {
         state.loading = true;
+      })
+      .addMatcher((action) => action.type.endsWith('rejected'), (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
       })
   }
 })
