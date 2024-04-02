@@ -21,7 +21,8 @@ import {
 import { useConfirm } from 'material-ui-confirm';
 import moment from 'moment';
 import { stringAvatar } from 'src/Utils';
-import { useAppDispatch } from 'src/hooks/useTypeSelector';
+import LikePost from 'src/components/LikePost/like-post';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
 import { deletePost, likePost } from 'src/reducers/postSlice';
 
@@ -44,7 +45,7 @@ const CustomCardContent = styled(CardContent)(({ theme }) => ({
 export interface IPostDetailsProps {
   post: Post;
   onEditPost?: (post: Post) => void;
-  onLikePost?: (post: Post) => void;
+  onLikePost?: () => void;
 }
 
 export default function PostDetails({
@@ -55,6 +56,7 @@ export default function PostDetails({
   const confirm = useConfirm();
 
   const dispatch = useAppDispatch();
+  const { data: auth } = useAppSelector((state) => state.auth);
 
   const onPostEditChange = (post: Post) => {
     if (onEditPost) {
@@ -70,12 +72,22 @@ export default function PostDetails({
       .catch(() => console.log('Cancel delete!'));
   };
 
-  const handleLikePost = (post: Post) => {
-    dispatch(likePost({ id: post?._id ?? '' }));
+  const handleLikePost = async (post: Post) => {
+    await dispatch(likePost({ id: post?._id ?? '' }));
 
     if (onLikePost) {
-      onLikePost(post);
+      onLikePost();
     }
+  };
+
+  const showIcon = (isEdit: boolean) => {
+    const authId = auth?.userProfile?._id ?? null;
+    if (authId && post?.userId === authId) {
+      const display = `inline-${isEdit ? 'block' : 'flex'}`;
+      return display;
+    }
+
+    return 'none';
   };
 
   return (
@@ -95,6 +107,7 @@ export default function PostDetails({
           <IconButton
             aria-label="edit-card"
             onClick={() => onPostEditChange(post)}
+            sx={{ display: showIcon(true) }}
           >
             <Edit fontSize="small" />
           </IconButton>
@@ -140,7 +153,6 @@ export default function PostDetails({
       </CustomCardContent>
       <CardActions
         sx={{
-          padding: '0 16px 8px 0',
           display: 'flex',
           justifyContent: 'space-between',
         }}
@@ -149,13 +161,15 @@ export default function PostDetails({
           size="small"
           color="primary"
           onClick={() => handleLikePost(post)}
+          disabled={!auth?.userProfile?._id}
         >
-          <ThumbUpAlt fontSize="small" /> &nbsp; {post.likeCount}
+          <LikePost post={post} />
         </Button>
         <Button
           size="small"
           color="primary"
           onClick={() => onDeleteChange(post?._id ?? '')}
+          sx={{ display: showIcon(false) }}
         >
           <DeleteOutline fontSize="small" /> &nbsp; Delete
         </Button>

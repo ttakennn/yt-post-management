@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const postSchema = mongoose.Schema({
+  userId: String,
   title: String,
   message: String,
   creator: String,
@@ -8,15 +9,15 @@ const postSchema = mongoose.Schema({
   selectedFile: String,
   fileName: String,
   likeCount: {
-    type: Number,
-    default: 0,
+    type: [String],
+    default: [],
   },
   createdAt: {
     type: Date,
     default: new Date(),
-  }
-})
+  },
+});
 
-const PostManagement = mongoose.model("PostManagement", postSchema);
+const PostManagement = mongoose.model('PostManagement', postSchema);
 
 export default PostManagement;

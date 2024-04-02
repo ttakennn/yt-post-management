@@ -19,6 +19,9 @@ import {
 import * as React from 'react';
 import { Props } from 'src/interfaces';
 import CustomPostButton from '../CustomMui/custom-create-post-button';
+import UserProfile from './user-profile';
+import { useAppSelector } from 'src/hooks/useTypeSelector';
+import { useDrawer } from 'src/hooks/useDrawer';
 
 function HideOnScroll(props: Props) {
   const { children, window } = props;
@@ -37,6 +40,8 @@ function HideOnScroll(props: Props) {
 }
 
 export default function Header(props: Props) {
+  const auth = useAppSelector((state) => state.auth.data);
+  const { CustomDrawerTemplate, showDrawer } = useDrawer();
   return (
     <React.Fragment>
       <CssBaseline />
@@ -44,24 +49,44 @@ export default function Header(props: Props) {
         <AppBar>
           <Container maxWidth="md">
             <Toolbar disableGutters={true}>
-              <IconButton size="large" edge="start" color="inherit" aria-label="menu-icon">
+              <IconButton
+                onClick={() => showDrawer()}
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu-icon"
+                sx={{
+                  display: {
+                    xs: 'inline',
+                    sm: 'none',
+                  },
+                }}
+              >
                 <Menu />
               </IconButton>
 
-              <Typography variant="h5">Post Management</Typography>
-
-              <CustomPostButton title="Post" />
-
-              <Typography align="right" component="div" sx={{ flexGrow: 1 }}>
-                Guest,
-                <IconButton size="small" edge="start" color="inherit" aria-label="login-icon">
-                  <Face6 />
-                </IconButton>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 700,
+                  mr: 2,
+                  fontSize: {
+                    xs: '1.2rem',
+                    sm: '1.5rem',
+                  },
+                }}
+              >
+                Post Management
               </Typography>
+
+              {auth?.userProfile && <CustomPostButton title="Post" />}
+
+              <UserProfile />
             </Toolbar>
           </Container>
         </AppBar>
       </HideOnScroll>
+      {CustomDrawerTemplate}
     </React.Fragment>
   );
 }

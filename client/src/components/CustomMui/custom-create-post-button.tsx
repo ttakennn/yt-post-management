@@ -3,6 +3,7 @@ import { Alert, AlertTitle, Button, Snackbar } from '@mui/material';
 import { useState } from 'react';
 import CustomPostDialogForm from './custom-post-dialog-form';
 import { PostRequest } from 'src/interfaces';
+import { useToastContext } from '../Toast/toast-provider';
 
 export interface ICustomPostButtonProps {
   title: string;
@@ -13,24 +14,12 @@ export default function CustomPostButton(props: ICustomPostButtonProps) {
   const { title } = props;
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [messageSnackBar, setMessageSnackBar] = useState('');
+  const showToast = useToastContext();
 
   const onHandleSnackBarChange = (postRequest: PostRequest) => {
     if (postRequest.status === 'SUCCESS') {
-      setOpenSnackBar(true);
-      setMessageSnackBar(postRequest.message);
+      showToast(postRequest.message, 'success');
     }
-  };
-
-  const handleSnackBarClose = (
-    event: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackBar(false);
   };
 
   return (
@@ -50,23 +39,6 @@ export default function CustomPostButton(props: ICustomPostButtonProps) {
         setOpen={setOpenDialog}
         onHandleSnackBar={onHandleSnackBarChange}
       />
-
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        open={openSnackBar}
-        autoHideDuration={3000}
-        onClose={handleSnackBarClose}
-      >
-        <Alert
-          onClose={handleSnackBarClose}
-          security="success"
-          variant="standard"
-          sx={{ width: '100%' }}
-        >
-          <AlertTitle>Success</AlertTitle>
-          {messageSnackBar}
-        </Alert>
-      </Snackbar>
     </>
   );
 }

@@ -4,6 +4,7 @@ import CustomPostDialogForm from 'src/components/CustomMui/custom-post-dialog-fo
 import { useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
 import PostDetails from './PostDetails';
+import { useToastContext } from 'src/components/Toast/toast-provider';
 
 export interface IPostProps {}
 
@@ -18,10 +19,9 @@ export default function Posts(props: IPostProps) {
     selectedFile: '',
   } as Post);
 
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [messageSnackBar, setMessageSnackBar] = useState('');
-
   const { data: postList } = useAppSelector((state) => state.posts);
+
+  const showToast = useToastContext();
 
   const onEditPostChange = (post: Post) => {
     console.log('onEditPostChange: ', post);
@@ -29,20 +29,8 @@ export default function Posts(props: IPostProps) {
     setOpen(true);
   };
 
-  const onLikePostChange = (post: Post) => {
-    console.log('onLikePostChange: ', post);
-    setOpenSnackBar(true);
-    setMessageSnackBar('Like success!');
-  };
-
-  const handleSnackBarClose = (
-    event: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackBar(false);
+  const onLikePostChange = () => {
+    showToast('Like success!', 'success');
   };
 
   return (
@@ -68,23 +56,6 @@ export default function Posts(props: IPostProps) {
         isOpen={open}
         setOpen={setOpen}
       />
-
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        open={openSnackBar}
-        autoHideDuration={1000}
-        onClose={handleSnackBarClose}
-      >
-        <Alert
-          onClose={handleSnackBarClose}
-          security="success"
-          variant="standard"
-          sx={{ width: '100%' }}
-        >
-          <AlertTitle>Success</AlertTitle>
-          {messageSnackBar}
-        </Alert>
-      </Snackbar>
     </Grid>
   );
 }

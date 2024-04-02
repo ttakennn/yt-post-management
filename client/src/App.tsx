@@ -1,10 +1,18 @@
-import Home from "./components/Home/home";
-import MainLayout from "./components/MainLayout/main-layout";
+import { Outlet } from 'react-router-dom';
+import MainLayout from './components/MainLayout/main-layout';
+import { useAuthLoader } from './hooks/useAuthLoader';
+import { useEffect } from 'react';
 
 function App() {
+  const { fetchAuthData } = useAuthLoader();
+
+  useEffect(() => {
+    fetchAuthData();
+  }, []);
+
   return (
     <MainLayout>
-      <Home />
+      <Outlet />
     </MainLayout>
   );
 }
