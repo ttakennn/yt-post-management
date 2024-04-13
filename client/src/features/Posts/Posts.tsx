@@ -1,10 +1,11 @@
-import { Alert, AlertTitle, Grid, Snackbar } from '@mui/material';
+import { Grid } from '@mui/material';
 import { useState } from 'react';
 import CustomPostDialogForm from 'src/components/CustomMui/custom-post-dialog-form';
+import { useToastContext } from 'src/components/Toast/toast-provider';
 import { useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
-import PostDetails from './PostDetails';
-import { useToastContext } from 'src/components/Toast/toast-provider';
+import PostCard from './PostCard';
+import LoadingSkeletonPost from 'src/components/skeleton/loading-skeleton-post';
 
 export interface IPostProps {}
 
@@ -15,11 +16,11 @@ export default function Posts(props: IPostProps) {
     creator: '',
     title: '',
     message: '',
-    tags: '',
+    tags: [],
     selectedFile: '',
   } as Post);
 
-  const { data: postList } = useAppSelector((state) => state.posts);
+  const { data: postList, loading } = useAppSelector((state) => state.posts);
 
   const showToast = useToastContext();
 
@@ -33,6 +34,14 @@ export default function Posts(props: IPostProps) {
     showToast('Like success!', 'success');
   };
 
+  if (loading) {
+    return <LoadingSkeletonPost />;
+  }
+
+  if (postList.length === 0) {
+    return <p>No posts!</p>;
+  }
+
   return (
     <Grid
       sx={{ display: 'flex', alignItems: 'center' }}
@@ -43,7 +52,7 @@ export default function Posts(props: IPostProps) {
     >
       {postList.map((post) => (
         <Grid item key={post._id} xs={12} sm={6} md={4}>
-          <PostDetails
+          <PostCard
             post={post}
             onEditPost={onEditPostChange}
             onLikePost={onLikePostChange}

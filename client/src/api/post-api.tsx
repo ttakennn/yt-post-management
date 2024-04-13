@@ -1,11 +1,11 @@
 import { POST_API } from 'src/constant';
 import axiosClient from './axiosClient';
-import { Post } from 'src/interfaces';
+import { Post, SearchProps } from 'src/interfaces';
 
 const postApi = {
-  getPosts() {
+  getPostById(id: string) {
     const url = POST_API.POSTS;
-    return axiosClient.get(url);
+    return axiosClient.get(`${url}/${id}`);
   },
   createPost(newPost: Post): Promise<any> {
     const url = POST_API.POSTS;
@@ -22,6 +22,13 @@ const postApi = {
   likePost(id: string): Promise<any> {
     const url = POST_API.POSTS;
     return axiosClient.patch(`${url}/${id}/likePost`);
+  },
+  getPostsBySearch(searchQuery: SearchProps): Promise<any> {
+    const url = `${POST_API.POSTS}/search?page=${searchQuery.page || 1}&title=${
+      searchQuery.title || ''
+    }&tags=${searchQuery.tags}`;
+
+    return axiosClient.get(url);
   },
 };
 

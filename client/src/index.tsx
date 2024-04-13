@@ -18,12 +18,15 @@ import Auth from './components/Auth/Auth';
 import NotFoundPage from './components/NotFound/not-found';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastProvider } from './components/Toast/toast-provider';
+import PostDetails from './features/Posts/PostDetails';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route element={<App />}>
         <Route path="/" element={<Home />}></Route>
+        <Route path="/posts/*" element={<Home />}></Route>
+        <Route path="/post/:id" element={<PostDetails />}></Route>
       </Route>
 
       <Route element={<AuthLayout />}>

@@ -7051,6 +7051,11 @@ ms@2.1.3, ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
+mui-chips-input@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/mui-chips-input/-/mui-chips-input-2.1.4.tgz#4c2e37b5f40cfffbbecef786c5dc6b6caa07c516"
+  integrity sha512-ysgY53fMO5q79znjBh/hW9TSy7c+nRs7sq7eEId8cdihimkDlQ40YaVzHvKhgUsU0McZ8OWE3guchtVdIl8HgA==
+
 mui-file-input@^4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/mui-file-input/-/mui-file-input-4.0.4.tgz#7cb2b82b6337b180cf3a4425dc1e44b2510a4724"

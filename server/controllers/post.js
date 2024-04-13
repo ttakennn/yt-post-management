@@ -11,6 +11,65 @@ export const getPosts = async (req, res) => {
   }
 };
 
+export const getPostById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const postManagement = await PostManagement.find({ _id: id });
+
+    res.status(200).json(postManagement);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+const checkFieldEmpty = (field) => {
+  return field === '' || field === null || field === undefined;
+};
+
+export const getPostsBySearch = async (req, res) => {
+  const { page, title, tags } = req.query;
+
+  try {
+    const ITEMS_PER_PAGE = 3;
+    const startIdx = (Number(page) - 1) * ITEMS_PER_PAGE;
+
+    const decodeTitle = decodeURIComponent(title || '');
+    const titleQuery = new RegExp(decodeTitle, 'i');
+
+    const tagsArray = tags ? tags.split(',').map((tag) => tag.trim()) : [];
+    const regexString = tagsArray.join('|');
+    const tagsQuery = new RegExp(regexString, 'i');
+
+    let query = {};
+
+    if (!checkFieldEmpty(decodeTitle) && checkFieldEmpty(tags)) {
+      query.title = titleQuery;
+    } else if (checkFieldEmpty(decodeTitle) && !checkFieldEmpty(tags)) {
+      query.tags = tagsQuery;
+    } else {
+      query = {
+        $or: [{ title: titleQuery }, { tags: tagsQuery }],
+      };
+    }
+
+    const total = await PostManagement.countDocuments(query);
+
+    const posts = await PostManagement.find(query)
+      .sort({ _id: -1 })
+      .limit(ITEMS_PER_PAGE)
+      .skip(startIdx);
+
+    res.status(200).json({
+      data: posts,
+      currentPage: Number(page) || 1,
+      totalPage: Math.ceil(total / ITEMS_PER_PAGE),
+    });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
 export const createPost = async (req, res) => {
   const post = req.body;
 

@@ -22,6 +22,7 @@ import CustomPostButton from '../CustomMui/custom-create-post-button';
 import UserProfile from './user-profile';
 import { useAppSelector } from 'src/hooks/useTypeSelector';
 import { useDrawer } from 'src/hooks/useDrawer';
+import { Link } from 'react-router-dom';
 
 function HideOnScroll(props: Props) {
   const { children, window } = props;
@@ -66,6 +67,8 @@ export default function Header(props: Props) {
               </IconButton>
 
               <Typography
+                component={Link}
+                to="/"
                 variant="h5"
                 sx={{
                   fontWeight: 700,
@@ -74,6 +77,7 @@ export default function Header(props: Props) {
                     xs: '1.2rem',
                     sm: '1.5rem',
                   },
+                  color: 'white',
                 }}
               >
                 Post Management

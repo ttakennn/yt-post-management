@@ -1,179 +1,188 @@
 import {
-  DeleteOutline,
-  Edit,
-  LocalOffer,
-  ThumbUpAlt,
-} from '@mui/icons-material';
-import {
-  Avatar,
   Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Chip,
-  IconButton,
+  Container,
+  Divider,
+  Grid,
+  Paper,
   Typography,
-  styled,
 } from '@mui/material';
-import { useConfirm } from 'material-ui-confirm';
 import moment from 'moment';
-import { stringAvatar } from 'src/Utils';
-import LikePost from 'src/components/LikePost/like-post';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import LoadingSkeletonPostDetails from 'src/components/skeleton/loading-skeleton-post-details';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
-import { deletePost, likePost } from 'src/reducers/postSlice';
+import { getPostById, getPostBySearch } from 'src/reducers/postSlice';
 
-// const CustomCardContent = styled(CardContent)`
-//   > p {
-//     text-overflow: ellipsis;
-//     white-space: nowrap;
-//     overflow: hidden;
-//   }
-// `;
+export interface IPostDetailsProps {}
 
-const CustomCardContent = styled(CardContent)(({ theme }) => ({
-  '> p': {
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-  },
-}));
+export default function PostDetails(props: IPostDetailsProps) {
+  const [suggestPosts, setSuggestPosts] = useState<Post[]>([]);
 
-export interface IPostDetailsProps {
-  post: Post;
-  onEditPost?: (post: Post) => void;
-  onLikePost?: () => void;
-}
-
-export default function PostDetails({
-  post,
-  onEditPost,
-  onLikePost,
-}: IPostDetailsProps) {
-  const confirm = useConfirm();
-
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data: auth } = useAppSelector((state) => state.auth);
 
-  const onPostEditChange = (post: Post) => {
-    if (onEditPost) {
-      onEditPost(post);
+  const {
+    post,
+    data: postList,
+    loading,
+  } = useAppSelector((state) => state.posts);
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getPostById({ id }));
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (post?._id) {
+      dispatch(
+        getPostBySearch({
+          searchQuery: { page: 1, title: '', tags: post?.tags },
+        }),
+      );
+    }
+  }, [post]);
+
+  useEffect(() => {
+    if (postList.length) {
+      const result = postList.filter(({ _id }) => _id !== post._id);
+      setSuggestPosts(result);
+    }
+  }, [postList]);
+
+  const openPost = (id: string) => {
+    if (id) {
+      navigate(`/post/${id}`);
     }
   };
 
-  const onDeleteChange = (id: string) => {
-    confirm({
-      title: `Are you sure delete this post?`,
-    })
-      .then(() => dispatch(deletePost({ id: id })))
-      .catch(() => console.log('Cancel delete!'));
-  };
+  if (!post._id) {
+    return null;
+  }
 
-  const handleLikePost = async (post: Post) => {
-    await dispatch(likePost({ id: post?._id ?? '' }));
-
-    if (onLikePost) {
-      onLikePost();
-    }
-  };
-
-  const showIcon = (isEdit: boolean) => {
-    const authId = auth?.userProfile?._id ?? null;
-    if (authId && post?.userId === authId) {
-      const display = `inline-${isEdit ? 'block' : 'flex'}`;
-      return display;
-    }
-
-    return 'none';
-  };
+  if (loading) {
+    return <LoadingSkeletonPostDetails />;
+  }
 
   return (
-    <Card
-      sx={{
-        maxWidth: 345,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        borderRadius: '16px',
-        position: 'relative',
-      }}
-    >
-      <CardHeader
-        avatar={<Avatar sizes="small" {...stringAvatar(post.creator)} />}
-        action={
-          <IconButton
-            aria-label="edit-card"
-            onClick={() => onPostEditChange(post)}
-            sx={{ display: showIcon(true) }}
+    <Container maxWidth="md" sx={{ mt: 10, mb: 10 }}>
+      <Paper sx={{ padding: 2, borderRadius: 1.5 }} elevation={3}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'column', md: 'row' },
+          }}
+        >
+          <Box sx={{ borderRadius: 2.5, margin: 1.5, flex: 1 }}>
+            <Typography variant="h4" component="h2">
+              {post.title}
+            </Typography>
+            <Typography
+              gutterBottom
+              variant="subtitle2"
+              component="h2"
+              color="textSecondary"
+            >
+              {post.tags.map((tag) => `#${tag} `)}
+            </Typography>
+            <Typography gutterBottom variant="body1" component="p">
+              {post.message}
+            </Typography>
+            <Typography variant="h6">Created By: {post.creator}</Typography>
+            <Typography variant="body1">
+              {moment(post.createdAt).fromNow()}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              width: { xs: '100%', sm: '100%', md: '400px' },
+              height: { xs: 'auto', sm: 'auto', md: '300px' },
+            }}
           >
-            <Edit fontSize="small" />
-          </IconButton>
-        }
-        title={post.creator}
-        subheader={moment(post.createdAt).fromNow()}
-      />
-      <CardMedia
-        sx={{
-          height: 0,
-          paddingTop: '56.25%',
-          backgroundColor: 'rgba(0, 0,0, 0.5)',
-          backgroundBlendMode: 'darken',
-        }}
-        image={post.selectedFile as string}
-      ></CardMedia>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          margin: '20px',
-        }}
-      >
-        <Typography variant="body2" color="textSecondary" component="div">
-          {post.tags?.split(',').map((item) => (
-            <Chip
-              size="small"
-              key={item}
-              label={`${item}`}
-              icon={<LocalOffer />}
-              sx={{ marginRight: '4px' }}
+            <img
+              style={{
+                borderRadius: 2.5,
+                objectFit: 'cover',
+                width: '100%',
+                height: '100%',
+              }}
+              src={post.selectedFile as string}
+              alt={post.title}
             />
-          ))}
-        </Typography>
-      </Box>
-      <Typography sx={{ padding: '0 16px' }} variant="h5" gutterBottom>
-        {post.title}
-      </Typography>
-      <CustomCardContent>
-        <Typography variant="body2" color="text.secondary">
-          {post.message}
-        </Typography>
-      </CustomCardContent>
-      <CardActions
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Button
-          size="small"
-          color="primary"
-          onClick={() => handleLikePost(post)}
-          disabled={!auth?.userProfile?._id}
-        >
-          <LikePost post={post} />
-        </Button>
-        <Button
-          size="small"
-          color="primary"
-          onClick={() => onDeleteChange(post?._id ?? '')}
-          sx={{ display: showIcon(false) }}
-        >
-          <DeleteOutline fontSize="small" /> &nbsp; Delete
-        </Button>
-      </CardActions>
-    </Card>
+          </Box>
+        </Box>
+        <Divider sx={{ mt: 2, mb: 2 }} />
+
+        {!!setSuggestPosts.length && (
+          <Box sx={{ borderRadius: 2.5, margin: 1.5, flex: 1 }}>
+            <Typography gutterBottom variant="h6">
+              You might also like this posts.
+            </Typography>
+            <Grid container spacing={2}>
+              {suggestPosts.map(
+                ({
+                  title,
+                  tags,
+                  creator,
+                  message,
+                  likeCount,
+                  selectedFile,
+                  _id,
+                }) => (
+                  <Grid item xs={12} sm={6} md={4} key={_id}>
+                    <Paper
+                      onClick={() => openPost(_id ?? '')}
+                      sx={{ cursor: 'pointer', padding: 2, mt: 2 }}
+                      key={_id}
+                    >
+                      <Typography gutterBottom variant="h6">
+                        {title}
+                      </Typography>
+                      <Typography
+                        gutterBottom
+                        variant="subtitle2"
+                        color="textSecondary"
+                      >
+                        {tags.map((tag) => `#${tag} `)}
+                      </Typography>
+                      <Typography gutterBottom variant="subtitle2">
+                        {creator}
+                      </Typography>
+                      <Typography
+                        gutterBottom
+                        variant="subtitle2"
+                        style={{
+                          display: '-webkit-box',
+                          maxWidth: '200px',
+                          WebkitLineClamp: 4,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {message}
+                      </Typography>
+                      <Typography gutterBottom variant="subtitle1">
+                        Likes: {likeCount?.length ?? 0}
+                      </Typography>
+                      <img
+                        alt={title}
+                        src={selectedFile as string}
+                        style={{
+                          width: '100%',
+                          height: '180px',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    </Paper>
+                  </Grid>
+                ),
+              )}
+            </Grid>
+          </Box>
+        )}
+      </Paper>
+    </Container>
   );
 }

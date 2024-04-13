@@ -4,7 +4,7 @@ export interface Post {
   creator: string;
   title: string;
   message: string;
-  tags: string;
+  tags: string[];
   selectedFile: File | string | null;
   fileName?: string;
   createdAt?: string;
@@ -14,4 +14,10 @@ export interface Post {
 export interface PostRequest {
   status: string;
   message: string;
+}
+
+export interface PostSearch {
+  data: Post[],
+  currentPage: number;
+  totalPage: number;
 }

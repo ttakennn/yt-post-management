@@ -13,11 +13,12 @@ export const REDUCERS = {
 }
 
 export const ACTIONS = {
-  GET_POSTS: "postsSlice/getPosts",
+  GET_POST_BY_ID: "postsSlice/getPostById",
   CREATE_POSTS: "postsSlice/createPosts",
   UPDATE_POSTS: "postsSlice/updatePosts",
   DELETE_POSTS: "postsSlice/deletePosts",
   LIKE_POSTS: "postsSlice/likePosts",
+  GET_POST_BY_SEARCH: "postsSlice/getPostBySearch",
 
   SIGN_IN: 'auth/signin',
   SIGN_UP: 'auth/signup',

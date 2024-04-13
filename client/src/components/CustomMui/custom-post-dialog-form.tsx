@@ -20,6 +20,7 @@ import * as yup from 'yup';
 import CustomMuiFileInput from './custom-mui-file-input';
 import CustomTextField from './custom-text-field';
 import { base64ToFile } from 'src/Utils/file';
+import CustomMuiChipsInput from './custom-mui-chips-input';
 
 export interface CustomPostDialogFormProps {
   isOpen: boolean;
@@ -49,7 +50,7 @@ export default function CustomPostDialogForm(props: CustomPostDialogFormProps) {
       .string()
       .required('Please enter message')
       .min(5, 'Message is too short'),
-    tags: yup.string().required('Please enter tags'),
+    tags: yup.array().required('Please enter tags'),
     selectedFile: yup
       .mixed()
       .test('fileSize', 'File is too large', (file) => {
@@ -70,7 +71,7 @@ export default function CustomPostDialogForm(props: CustomPostDialogFormProps) {
       creator: '',
       title: '',
       message: '',
-      tags: '',
+      tags: [],
       selectedFile: null,
     },
     resolver: yupResolver(schema),
@@ -197,29 +198,23 @@ export default function CustomPostDialogForm(props: CustomPostDialogFormProps) {
             label="Creator"
             control={control}
             size="small"
-            margin="normal"
+            sx={{ mt: 1, mb: 1.5 }}
           />
           <CustomTextField
             name="title"
             label="Title"
             control={control}
             size="small"
-            margin="normal"
+            sx={{ mb: 1.5 }}
           />
           <CustomTextField
             name="message"
             label="Message"
             control={control}
             size="small"
-            margin="normal"
+            sx={{ mb: 1.5 }}
           />
-          <CustomTextField
-            name="tags"
-            label="Tags"
-            control={control}
-            size="small"
-            margin="normal"
-          />
+          <CustomMuiChipsInput name="tags" control={control} sx={{ mb: 1.5 }} />
           <CustomMuiFileInput
             name="selectedFile"
             control={control}

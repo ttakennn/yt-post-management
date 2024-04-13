@@ -2,10 +2,10 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import postApi from "src/api/post-api";
 import { ACTIONS, REDUCERS } from "src/constant";
-import { Post } from "src/interfaces";
+import { Post, PostSearch, SearchProps } from "src/interfaces";
 
-export const getPosts = createAsyncThunk(ACTIONS.GET_POSTS, async () => {
-  const response = await postApi.getPosts();
+export const getPostById = createAsyncThunk<Post[], { id: string }>(ACTIONS.GET_POST_BY_ID, async ({ id }) => {
+  const response = await postApi.getPostById(id);
   return response?.data || [];
 });
 
@@ -75,10 +75,20 @@ export const likePost = createAsyncThunk<Post, { id: string | null }>(
   }
 );
 
+export const getPostBySearch = createAsyncThunk<PostSearch, { searchQuery: SearchProps }
+>(ACTIONS.GET_POST_BY_SEARCH, async ({ searchQuery }) => {
+  const response = await postApi.getPostsBySearch(searchQuery);
+
+  return (response?.data as PostSearch) || [];
+})
+
 const initialState = {
   loading: false,
   error: null,
   data: [] as Post[],
+  post: {} as Post,
+  currentPage: 1,
+  totalPage: 0,
 }
 
 const postsSlice = createSlice({
@@ -87,10 +97,11 @@ const postsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getPosts.fulfilled, (state, action) => {
-        console.log("getPosts: ", action);
+      .addCase(getPostById.fulfilled, (state, action: PayloadAction<Post[]>) => {
         state.loading = false;
-        state.data = action.payload;
+        if (action.payload.length) {
+          state.post = action.payload[0];
+        }
       })
       .addCase(createPosts.fulfilled, (state, action: PayloadAction<Post>) => {
         state.loading = false;
@@ -113,6 +124,13 @@ const postsSlice = createSlice({
         state.data = state.data.map((post: Post) =>
           post._id === action.payload._id ? action.payload : post
         )
+      })
+      .addCase(getPostBySearch.fulfilled, (state, action: PayloadAction<PostSearch>) => {
+        state.loading = false;
+        const { data, currentPage, totalPage } = action.payload;
+        state.data = data;
+        state.currentPage = currentPage;
+        state.totalPage = totalPage;
       })
       .addMatcher((action) => action.type.endsWith('pending'), (state, action) => {
         state.loading = true;
