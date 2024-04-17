@@ -19,6 +19,7 @@ export const ACTIONS = {
   DELETE_POSTS: "postsSlice/deletePosts",
   LIKE_POSTS: "postsSlice/likePosts",
   GET_POST_BY_SEARCH: "postsSlice/getPostBySearch",
+  COMMENT_POST: "postsSlice/commentPost",
 
   SIGN_IN: 'auth/signin',
   SIGN_UP: 'auth/signup',

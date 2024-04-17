@@ -140,3 +140,26 @@ export const likePost = async (req, res) => {
 
   res.json(updatePost);
 };
+
+export const commentPost = async (req, res) => {
+  const { id } = req.params;
+  const { name, comment } = req.body;
+
+  const post = await PostManagement.findById(id);
+
+  if (!post) {
+    return res.status(404).send('No post with id!');
+  }
+
+  post.comments.push({
+    name: name,
+    message: comment,
+    createdAt: new Date().toISOString(),
+  });
+
+  const updatePost = await PostManagement.findByIdAndUpdate(id, post, {
+    new: true,
+  });
+
+  res.json(updatePost);
+};

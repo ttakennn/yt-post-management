@@ -9,6 +9,7 @@ export interface Post {
   fileName?: string;
   createdAt?: string;
   likeCount?: string[];
+  comments?: CommentProps[];
 }
 
 export interface PostRequest {
@@ -20,4 +21,10 @@ export interface PostSearch {
   data: Post[],
   currentPage: number;
   totalPage: number;
+}
+
+export interface CommentProps {
+  name: string;
+  message: string;
+  createdAt: string;
 }

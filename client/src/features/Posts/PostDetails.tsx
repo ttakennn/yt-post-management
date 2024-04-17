@@ -13,6 +13,7 @@ import LoadingSkeletonPostDetails from 'src/components/skeleton/loading-skeleton
 import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
 import { getPostById, getPostBySearch } from 'src/reducers/postSlice';
+import PostComments from './PostComments';
 
 export interface IPostDetailsProps {}
 
@@ -114,6 +115,8 @@ export default function PostDetails(props: IPostDetailsProps) {
           </Box>
         </Box>
         <Divider sx={{ mt: 2, mb: 2 }} />
+
+        <PostComments post={post} />
 
         {!!setSuggestPosts.length && (
           <Box sx={{ borderRadius: 2.5, margin: 1.5, flex: 1 }}>

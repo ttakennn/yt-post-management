@@ -30,6 +30,10 @@ const postApi = {
 
     return axiosClient.get(url);
   },
+  commentPost(id: string, name: string, comment: string): Promise<any> {
+    const url = `${POST_API.POSTS}`;
+    return axiosClient.post(`${url}/${id}/commentPost`, { name, comment });
+  },
 };
 
 export default postApi;

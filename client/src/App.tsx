@@ -32,9 +32,10 @@ function App() {
         await fetchPostData(payloadSeach);
       };
 
-      fetchAuthData();
       fetchData();
     }
+
+    fetchAuthData();
   }, [location]);
 
   useEffect(() => {
