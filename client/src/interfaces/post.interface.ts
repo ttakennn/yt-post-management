@@ -1,3 +1,5 @@
+import { AxiosInstance } from "axios";
+
 export interface Post {
   _id?: string | null;
   userId?: string;
@@ -27,4 +29,8 @@ export interface CommentProps {
   name: string;
   message: string;
   createdAt: string;
+}
+
+export interface PostProps {
+  axiosInstance: AxiosInstance
 }

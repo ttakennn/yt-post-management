@@ -1,11 +1,9 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import MainLayout from './components/MainLayout/main-layout';
-import { useAuthLoader } from './hooks/useAuthLoader';
 import { useEffect } from 'react';
 import { usePostLoader } from './hooks/usePostLoader';
 
 function App() {
-  const { fetchAuthData } = useAuthLoader();
   const { fetchPostData } = usePostLoader();
 
   const location = useLocation();
@@ -34,8 +32,6 @@ function App() {
 
       fetchData();
     }
-
-    fetchAuthData();
   }, [location]);
 
   useEffect(() => {

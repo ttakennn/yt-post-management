@@ -2,18 +2,18 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import postApi from "src/api/post-api";
 import { ACTIONS, REDUCERS } from "src/constant";
-import { Post, PostSearch, SearchProps } from "src/interfaces";
+import { Post, PostProps, PostSearch, SearchProps } from "src/interfaces";
 
-export const getPostById = createAsyncThunk<Post[], { id: string }>(ACTIONS.GET_POST_BY_ID, async ({ id }) => {
-  const response = await postApi.getPostById(id);
+export const getPostById = createAsyncThunk<Post[], { id: string, postProps: PostProps }>(ACTIONS.GET_POST_BY_ID, async ({ id, postProps }) => {
+  const response = await postApi.getPostById(id, postProps.axiosInstance);
   return response?.data || [];
 });
 
-export const createPosts = createAsyncThunk(ACTIONS.CREATE_POSTS,
-  async (newPost: Post, thunkApi) => {
+export const createPosts = createAsyncThunk<Post, { newPost: Post, postProps: PostProps }>(ACTIONS.CREATE_POSTS,
+  async ({ newPost, postProps }, thunkApi) => {
     try {
 
-      const response = await postApi.createPost(newPost);
+      const response = await postApi.createPost(newPost, postProps.axiosInstance);
 
       console.log("createPosts api: ", response);
       return (response?.data as Post) || [];
@@ -28,10 +28,10 @@ export const createPosts = createAsyncThunk(ACTIONS.CREATE_POSTS,
   }
 );
 
-export const updatePost = createAsyncThunk<Post, { id: string, updatePost: Post }>(
-  ACTIONS.UPDATE_POSTS, async ({ id, updatePost }, thunkApi) => {
+export const updatePost = createAsyncThunk<Post, { id: string, updatePost: Post, postProps: PostProps }>(
+  ACTIONS.UPDATE_POSTS, async ({ id, updatePost, postProps }, thunkApi) => {
     try {
-      const response = await postApi.updatePost(id, updatePost);
+      const response = await postApi.updatePost(id, updatePost, postProps.axiosInstance);
 
       return response?.data || [];
     } catch (error: any) {
@@ -41,14 +41,14 @@ export const updatePost = createAsyncThunk<Post, { id: string, updatePost: Post 
   }
 );
 
-export const deletePost = createAsyncThunk<string, { id: string | null }>(
-  ACTIONS.DELETE_POSTS, async ({ id }, thunkApi) => {
+export const deletePost = createAsyncThunk<string, { id: string | null, postProps: PostProps }>(
+  ACTIONS.DELETE_POSTS, async ({ id, postProps }, thunkApi) => {
     try {
       if (id === null) {
         return thunkApi.rejectWithValue("Failed to delete post");
       }
 
-      await postApi.deletePost(id);
+      await postApi.deletePost(id, postProps.axiosInstance);
 
       return id;
     } catch (error: any) {
@@ -58,14 +58,14 @@ export const deletePost = createAsyncThunk<string, { id: string | null }>(
   }
 );
 
-export const likePost = createAsyncThunk<Post, { id: string | null }>(
-  ACTIONS.LIKE_POSTS, async ({ id }, thunkApi) => {
+export const likePost = createAsyncThunk<Post, { id: string | null, postProps: PostProps }>(
+  ACTIONS.LIKE_POSTS, async ({ id, postProps }, thunkApi) => {
     try {
       if (id === null) {
         return thunkApi.rejectWithValue("Failed to like post");
       }
 
-      const response = await postApi.likePost(id);
+      const response = await postApi.likePost(id, postProps.axiosInstance);
 
       return response?.data || [];
     } catch (error: any) {
@@ -75,21 +75,21 @@ export const likePost = createAsyncThunk<Post, { id: string | null }>(
   }
 );
 
-export const getPostBySearch = createAsyncThunk<PostSearch, { searchQuery: SearchProps }
->(ACTIONS.GET_POST_BY_SEARCH, async ({ searchQuery }) => {
-  const response = await postApi.getPostsBySearch(searchQuery);
+export const getPostBySearch = createAsyncThunk<PostSearch, { searchQuery: SearchProps, postProps: PostProps }
+>(ACTIONS.GET_POST_BY_SEARCH, async ({ searchQuery, postProps }) => {
+  const response = await postApi.getPostsBySearch(searchQuery, postProps.axiosInstance);
 
   return (response?.data as PostSearch) || [];
 })
 
-export const commentPost = createAsyncThunk<Post, { id: string | null, name: string, comment: string }
->(ACTIONS.COMMENT_POST, async ({ id, name, comment }, thunkApi) => {
+export const commentPost = createAsyncThunk<Post, { id: string | null, name: string, comment: string, postProps: PostProps }
+>(ACTIONS.COMMENT_POST, async ({ id, name, comment, postProps }, thunkApi) => {
   try {
     if (id === null) {
       return thunkApi.rejectWithValue("Fail to comment post - id is null");
     }
 
-    const response = await postApi.commentPost(id, name, comment);
+    const response = await postApi.commentPost(id, name, comment, postProps.axiosInstance);
 
     return (response?.data as Post) || []
   } catch (error: any) {

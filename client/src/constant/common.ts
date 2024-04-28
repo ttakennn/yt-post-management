@@ -24,7 +24,3 @@ export const ACTIONS = {
   SIGN_IN: 'auth/signin',
   SIGN_UP: 'auth/signup',
 }
-
-export const STORAGE = {
-  USER_PROFILE: 'user-profile'
-}

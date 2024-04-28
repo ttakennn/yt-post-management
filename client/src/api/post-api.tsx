@@ -1,38 +1,50 @@
 import { POST_API } from 'src/constant';
-import axiosClient from './axiosClient';
 import { Post, SearchProps } from 'src/interfaces';
+import { AxiosInstance } from 'axios';
 
 const postApi = {
-  getPostById(id: string) {
+  getPostById(id: string, axiosInstance: AxiosInstance) {
     const url = POST_API.POSTS;
-    return axiosClient.get(`${url}/${id}`);
+    return axiosInstance.get(`${url}/${id}`);
   },
-  createPost(newPost: Post): Promise<any> {
+  createPost(newPost: Post, axiosInstance: AxiosInstance): Promise<any> {
     const url = POST_API.POSTS;
-    return axiosClient.post(url, newPost);
+    return axiosInstance.post(url, newPost);
   },
-  updatePost(id: string, updatePost: Post): Promise<any> {
+  updatePost(
+    id: string,
+    updatePost: Post,
+    axiosInstance: AxiosInstance,
+  ): Promise<any> {
     const url = POST_API.POSTS;
-    return axiosClient.patch(`${url}/${id}`, updatePost);
+    return axiosInstance.patch(`${url}/${id}`, updatePost);
   },
-  deletePost(id: string): Promise<any> {
+  deletePost(id: string, axiosInstance: AxiosInstance): Promise<any> {
     const url = POST_API.POSTS;
-    return axiosClient.delete(`${url}/${id}`);
+    return axiosInstance.delete(`${url}/${id}`);
   },
-  likePost(id: string): Promise<any> {
+  likePost(id: string, axiosInstance: AxiosInstance): Promise<any> {
     const url = POST_API.POSTS;
-    return axiosClient.patch(`${url}/${id}/likePost`);
+    return axiosInstance.patch(`${url}/${id}/likePost`);
   },
-  getPostsBySearch(searchQuery: SearchProps): Promise<any> {
+  getPostsBySearch(
+    searchQuery: SearchProps,
+    axiosInstance: AxiosInstance,
+  ): Promise<any> {
     const url = `${POST_API.POSTS}/search?page=${searchQuery.page || 1}&title=${
       searchQuery.title || ''
     }&tags=${searchQuery.tags}`;
 
-    return axiosClient.get(url);
+    return axiosInstance.get(url);
   },
-  commentPost(id: string, name: string, comment: string): Promise<any> {
+  commentPost(
+    id: string,
+    name: string,
+    comment: string,
+    axiosInstance: AxiosInstance,
+  ): Promise<any> {
     const url = `${POST_API.POSTS}`;
-    return axiosClient.post(`${url}/${id}/commentPost`, { name, comment });
+    return axiosInstance.post(`${url}/${id}/commentPost`, { name, comment });
   },
 };
 

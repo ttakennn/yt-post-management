@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import authApi from "src/api/auth-api";
-import { ACTIONS, REDUCERS, STORAGE } from "src/constant";
+import { ACTIONS, REDUCERS } from "src/constant";
 import { Auth, AuthForm, EmailProfile } from "src/interfaces";
 
 const getAuthData = (token: string, result: EmailProfile) => {
@@ -58,12 +58,10 @@ const authSlice = createSlice({
   initialState: initialState,
   reducers: {
     saveAuth: (state, action: PayloadAction<Auth>) => {
-      localStorage.setItem(STORAGE.USER_PROFILE, JSON.stringify({ ...action.payload }));
       state.data = { ...state.data, ...action.payload };
     },
     removeAuth: (state) => {
       state.data = {} as Auth;
-      localStorage.removeItem(STORAGE.USER_PROFILE);
     }
   },
   extraReducers: (builder) => {
@@ -73,8 +71,6 @@ const authSlice = createSlice({
           state.loading = false;
           const authData = action.payload;
           state.data = { ...state.data, ...authData };
-
-          localStorage.setItem(STORAGE.USER_PROFILE, JSON.stringify(authData));
         }
       )
       .addMatcher(

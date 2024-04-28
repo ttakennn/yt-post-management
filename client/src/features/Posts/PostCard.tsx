@@ -1,9 +1,4 @@
-import {
-  DeleteOutline,
-  Edit,
-  LocalOffer,
-  ThumbUpAlt,
-} from '@mui/icons-material';
+import { DeleteOutline, Edit, LocalOffer } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -23,6 +18,7 @@ import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { stringAvatar } from 'src/Utils';
 import LikePost from 'src/components/LikePost/like-post';
+import { useAxios } from 'src/hooks/useAxios';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
 import { deletePost, likePost } from 'src/reducers/postSlice';
@@ -57,6 +53,7 @@ export default function PostCard({
   const confirm = useConfirm();
 
   const navigate = useNavigate();
+  const axiosInstance = useAxios();
 
   const dispatch = useAppDispatch();
   const { data: auth } = useAppSelector((state) => state.auth);
@@ -71,12 +68,16 @@ export default function PostCard({
     confirm({
       title: `Are you sure delete this post?`,
     })
-      .then(() => dispatch(deletePost({ id: id })))
+      .then(() =>
+        dispatch(deletePost({ id: id, postProps: { axiosInstance } })),
+      )
       .catch(() => console.log('Cancel delete!'));
   };
 
   const handleLikePost = async (post: Post) => {
-    await dispatch(likePost({ id: post?._id ?? '' }));
+    await dispatch(
+      likePost({ id: post?._id ?? '', postProps: { axiosInstance } }),
+    );
 
     if (onLikePost) {
       onLikePost();

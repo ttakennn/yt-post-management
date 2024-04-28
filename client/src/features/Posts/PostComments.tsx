@@ -10,6 +10,7 @@ import {
 import { PayloadAction } from '@reduxjs/toolkit';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
+import { useAxios } from 'src/hooks/useAxios';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { CommentProps, Post } from 'src/interfaces';
 import { commentPost } from 'src/reducers/postSlice';
@@ -30,6 +31,7 @@ export default function PostComments({ post }: IPostCommentsProps) {
   const { loadingComment } = useAppSelector((state) => state.posts);
 
   const dispatch = useAppDispatch();
+  const axiosInstance = useAxios();
 
   const handleCommentClick = async () => {
     if (user.userProfile) {
@@ -37,6 +39,9 @@ export default function PostComments({ post }: IPostCommentsProps) {
         id: post._id ?? null,
         name: user.userProfile.name,
         comment: comment,
+        postProps: {
+          axiosInstance,
+        },
       };
 
       const newPost = (await dispatch(

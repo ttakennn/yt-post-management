@@ -21,6 +21,7 @@ import CustomMuiFileInput from './custom-mui-file-input';
 import CustomTextField from './custom-text-field';
 import { base64ToFile } from 'src/Utils/file';
 import CustomMuiChipsInput from './custom-mui-chips-input';
+import { useAxios } from 'src/hooks/useAxios';
 
 export interface CustomPostDialogFormProps {
   isOpen: boolean;
@@ -38,6 +39,8 @@ export default function CustomPostDialogForm(props: CustomPostDialogFormProps) {
   });
 
   const dispatch = useAppDispatch();
+  const axiosInstance = useAxios();
+
   const { loading, error } = useAppSelector((state) => state.posts);
 
   const schema = yup.object().shape({
@@ -96,10 +99,19 @@ export default function CustomPostDialogForm(props: CustomPostDialogFormProps) {
     let result = null;
     if (postEdit?._id) {
       result = await dispatch(
-        updatePost({ id: postEdit._id, updatePost: newPost }),
+        updatePost({
+          id: postEdit._id,
+          updatePost: newPost,
+          postProps: { axiosInstance },
+        }),
       );
     } else {
-      result = (await dispatch(createPosts(newPost))) as any;
+      result = (await dispatch(
+        createPosts({
+          newPost,
+          postProps: { axiosInstance },
+        }),
+      )) as any;
     }
 
     const hasError = result?.error?.message ?? '';

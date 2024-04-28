@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { Post } from 'src/interfaces';
 import { getPostById, getPostBySearch } from 'src/reducers/postSlice';
 import PostComments from './PostComments';
+import { useAxios } from 'src/hooks/useAxios';
 
 export interface IPostDetailsProps {}
 
@@ -22,6 +23,8 @@ export default function PostDetails(props: IPostDetailsProps) {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const axiosInstance = useAxios();
 
   const {
     post,
@@ -32,7 +35,7 @@ export default function PostDetails(props: IPostDetailsProps) {
 
   useEffect(() => {
     if (id) {
-      dispatch(getPostById({ id }));
+      dispatch(getPostById({ id, postProps: { axiosInstance } }));
     }
   }, [id]);
 
@@ -41,6 +44,7 @@ export default function PostDetails(props: IPostDetailsProps) {
       dispatch(
         getPostBySearch({
           searchQuery: { page: 1, title: '', tags: post?.tags },
+          postProps: { axiosInstance },
         }),
       );
     }

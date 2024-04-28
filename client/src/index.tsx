@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
-import store from './store/store';
+import { store, persistor } from './store/store';
 import { ConfirmProvider } from 'material-ui-confirm';
 import {
   Route,
@@ -19,6 +19,7 @@ import NotFoundPage from './components/NotFound/not-found';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastProvider } from './components/Toast/toast-provider';
 import PostDetails from './features/Posts/PostDetails';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,13 +45,15 @@ const root = ReactDOM.createRoot(
 root.render(
   <ConfirmProvider>
     <Provider store={store}>
-      <GoogleOAuthProvider clientId="88551598840-50tb5cd5d6u73ejrrn67cme7cdg6pbmk.apps.googleusercontent.com">
-        {/* <React.StrictMode> */}
-        <ToastProvider>
-          <RouterProvider router={router} />
-        </ToastProvider>
-        {/* </React.StrictMode> */}
-      </GoogleOAuthProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <GoogleOAuthProvider clientId="88551598840-50tb5cd5d6u73ejrrn67cme7cdg6pbmk.apps.googleusercontent.com">
+          {/* <React.StrictMode> */}
+          <ToastProvider>
+            <RouterProvider router={router} />
+          </ToastProvider>
+          {/* </React.StrictMode> */}
+        </GoogleOAuthProvider>
+      </PersistGate>
     </Provider>
   </ConfirmProvider>,
 );
