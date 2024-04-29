@@ -5,13 +5,19 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import postRouter from './router/post.js';
 import userRouter from './router/user.js';
+import cookieParser from 'cookie-parser';
+import credentials from './config/credentials.js';
+import corsOptions from './config/corsOptions.js';
 
 const app = express();
 dotenv.config();
 
 app.use(bodyParser.json({ limit: '20mb', extended: true }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
-app.use(cors());
+
+app.use(credentials);
+app.use(cors(corsOptions));
+app.use(cookieParser());
 
 // router
 app.use('/posts', postRouter);

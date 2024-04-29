@@ -57,7 +57,7 @@ const authSlice = createSlice({
   name: REDUCERS.AUTH,
   initialState: initialState,
   reducers: {
-    saveAuth: (state, action: PayloadAction<Auth>) => {
+    saveAuth: (state, action: PayloadAction<Partial<Auth>>) => {
       state.data = { ...state.data, ...action.payload };
     },
     removeAuth: (state) => {

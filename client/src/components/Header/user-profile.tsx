@@ -13,11 +13,15 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useTypeSelector';
 import { removeAuth } from 'src/reducers/authSlice';
 import { useToastContext } from '../Toast/toast-provider';
+import { useAuth } from 'src/hooks/useAuth';
 
 export interface IUserProfileProps {}
 
 export default function UserProfile(props: IUserProfileProps) {
   const dispatch = useAppDispatch();
+
+  const { logout } = useAuth();
+
   const { data: auth } = useAppSelector((state) => state.auth);
 
   const showToast = useToastContext();
@@ -31,8 +35,9 @@ export default function UserProfile(props: IUserProfileProps) {
     setAnchorElUser(null);
   };
 
-  const logoutUSer = () => {
-    dispatch(removeAuth());
+  const logoutUSer = async () => {
+    await logout();
+
     showToast('Logout successfully!', 'info');
   };
 

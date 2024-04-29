@@ -79,9 +79,9 @@ export default function PostCard({
       likePost({ id: post?._id ?? '', postProps: { axiosInstance } }),
     );
 
-    if (onLikePost) {
-      onLikePost();
-    }
+    // if (onLikePost) {
+    //   onLikePost();
+    // }
   };
 
   const showIcon = (isEdit: boolean) => {

@@ -21,7 +21,7 @@ const CustomToast = (props: ICustomToastProps) => {
     >
       <Alert
         onClose={onClose}
-        security={severity}
+        severity={severity}
         variant="standard"
         sx={{ width: '100%' }}
       >

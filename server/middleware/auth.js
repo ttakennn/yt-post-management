@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { USER } from '../constant/user.js';
 
 const auth = async (req, res, next) => {
   try {
@@ -15,7 +14,7 @@ const auth = async (req, res, next) => {
     const hasGoogleId = decodeToken?.sub || '';
     const decodeData = hasGoogleId
       ? jwt.decode(token)
-      : jwt.verify(token, USER.SECRET_KEY);
+      : jwt.verify(token, process.env.ACCESS_TOKEN);
 
     if (hasGoogleId) {
       req.userId = decodeData.sub;
@@ -25,7 +24,7 @@ const auth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error);
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 };
 
